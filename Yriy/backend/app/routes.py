@@ -55,3 +55,24 @@ async def get_all_data():
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
 
+
+@router.post('/post_sql')
+async def push(sql_query: str):
+    try:
+        with engine.connect() as conn:
+            conn.execute(text(sql_query))
+            conn.commit()
+            return {'message': 'Successfully'}
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.get('/get_sql')
+async def get_sql(sql_query: str):
+    try:
+        with engine.connect() as conn:
+            res = str(conn.execute(text(sql_query)).fetchall())
+            return res
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
