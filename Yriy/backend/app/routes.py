@@ -57,7 +57,7 @@ async def get_all_data():
 
 
 @router.post('/post_sql')
-async def push(sql_query: str):
+async def post_sql(sql_query: str):
     try:
         with engine.connect() as conn:
             conn.execute(text(sql_query))
@@ -76,3 +76,52 @@ async def get_sql(sql_query: str):
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
 
+
+@router.get('/install_triggers')
+async def install_triggers():
+    """Установка триггерных функций"""
+    try:
+        with engine.connect() as conn:
+            existing = conn.execute(text("""
+                    SELECT tgname FROM pg_trigger 
+                    WHERE tgname IN (
+                        'trg_validate_car_date',
+                        'trg_check_driver_license',
+                        'trg_validate_trip_end_time')
+                """)).fetchall()
+            if existing:
+                return {
+                    "message": "Некоторые триггеры уже существуют",
+                    "existing": [row[0] for row in existing]
+                }
+        with open('app/bd_scripts/triggers.sql', 'r') as file:
+            sql_script = text(file.read())
+            with engine.connect() as conn:
+                conn.execute(sql_script)
+                conn.commit()
+        return {"message": "Триггерные функции успешно установлены"}
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.get("/remove_triggers")
+async def remove_triggers():
+    """Удаление триггерных функций"""
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("""
+                DROP TRIGGER IF EXISTS trg_validate_car_date ON cars;
+                DROP TRIGGER IF EXISTS trg_check_driver_license ON trip;
+                DROP TRIGGER IF EXISTS trg_validate_trip_end_time ON trip;
+            """))
+
+            conn.execute(text("""
+                DROP FUNCTION IF EXISTS validate_car_date();
+                DROP FUNCTION IF EXISTS check_driver_license();
+                DROP FUNCTION IF EXISTS validate_trip_end_time();
+            """))
+
+        return {"message": "Триггерные функции успешно удалены"}
+
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
