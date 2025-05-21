@@ -3,8 +3,8 @@ from sqlalchemy import text
 from fastapi import APIRouter
 from .services import get_tables
 
-
 router = APIRouter()
+
 
 @router.get('/fill_test_data')
 async def fill_test_data():
@@ -75,4 +75,3 @@ async def get_sql(sql_query: str):
             return res
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
-
