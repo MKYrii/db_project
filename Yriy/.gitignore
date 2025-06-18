@@ -1,2 +1,3 @@
 /backend/bd_env*
 *.iml
+*.pyc
