@@ -1,7 +1,10 @@
 from .database import engine
 from sqlalchemy import text
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from .services import get_tables
+from datetime import datetime
+from typing import List, Optional
+from math import ceil
 
 
 router = APIRouter()
@@ -122,6 +125,83 @@ async def remove_triggers():
             """))
 
         return {"message": "Триггерные функции успешно удалены"}
+
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.post("/add_trip")
+async def add_trip(
+        car_id: int,
+        user_id: int,
+        start_time: datetime,
+        end_time: datetime,
+        end_coords: Optional[str] = None,
+        problems: Optional[str] = None,
+        comments: Optional[str] = None,
+        end_city: Optional[str] = None,
+):
+    """
+    Добавляет новую поездку в базу данных и обновляет местоположение автомобиля.
+
+    Параметры:
+    - car_id: ID автомобиля
+    - user_id: ID пользователя
+    - problems: Описание проблем (если были)
+    - comments: Комментарии к поездке
+    - start_time: Время начала поездки
+    - end_time: Время окончания поездки
+    - end_coords: Координаты, где закончилась поездка
+
+    Возвращает:
+    - Сообщение об успешном добавлении или ошибку
+    """
+
+    trip_query = text("""
+        INSERT INTO Trip (start_time, end_time, problems, comments, car_id, user_id)
+        VALUES (:start_time, :end_time, :problems, :comments, :car_id, :user_id)
+    """)
+
+    car_query = text("""
+        UPDATE Cars 
+        SET coordinates = :coordinates, mileage = mileage + :distance 
+        WHERE car_id = :car_id
+    """)
+    end_coords = list(map(float, end_coords.split(',')))
+    if end_city:
+        car_query = text("""
+                UPDATE Cars 
+                SET coordinates = :coordinates, city = :end_city
+                WHERE car_id = :car_id
+            """)
+
+    try:
+        with engine.begin() as conn:
+            conn.execute(
+                trip_query,
+                {
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "problems": problems,
+                    "comments": comments,
+                    "car_id": car_id,
+                    "user_id": user_id
+                }
+            )
+
+            coordinates = float(end_coords[0])
+            conn.execute(
+                car_query,
+                {
+                    "coordinates": coordinates,
+                    "car_id": car_id,
+                    "end_city": end_city,
+                    "distance": 25
+                }
+            )
+            conn.commit()
+
+        return {"message": "Поездка успешно добавлена"}
 
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
