@@ -3,8 +3,11 @@ from typing import Optional
 
 from .database import engine
 from sqlalchemy import text
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from .services import get_tables
+from datetime import datetime
+from typing import List, Optional
+from math import ceil
 
 router = APIRouter()
 
@@ -16,9 +19,6 @@ async def fill_test_data():
             sql_script = text(file.read())
             try:
                 with engine.connect() as connection:
-                    check_data = connection.execute(text("SELECT * FROM Users")).fetchall()
-                    if 'ivan_ivanov' == check_data[0][1]:
-                        return {'message': 'Data already exists'}
                     connection.execute(sql_script)
                     test_data = connection.execute(text("SELECT * from models")).fetchall()
                     if 'Toyota' == test_data[0][1]:
@@ -60,7 +60,7 @@ async def get_all_data():
 
 
 @router.post('/post_sql')
-async def push(sql_query: str):
+async def post_sql(sql_query: str):
     try:
         with engine.connect() as conn:
             conn.execute(text(sql_query))
@@ -79,6 +79,8 @@ async def get_sql(sql_query: str):
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
 
+
+     
 @router.get('/install_triggers')
 async def install_triggers():
     """Установка триггерных функций"""
