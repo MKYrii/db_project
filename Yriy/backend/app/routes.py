@@ -16,9 +16,6 @@ async def fill_test_data():
             sql_script = text(file.read())
             try:
                 with engine.connect() as connection:
-                    check_data = connection.execute(text("SELECT * FROM Users")).fetchall()
-                    if 'ivan_ivanov' == check_data[0][1]:
-                        return {'message': 'Data already exists'}
                     connection.execute(sql_script)
                     test_data = connection.execute(text("SELECT * from models")).fetchall()
                     if 'Toyota' == test_data[0][1]:
