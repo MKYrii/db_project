@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Простой интерфейс к FastAPI</title>
+  <style>
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+    }
+    pre {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow: auto;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 8px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Управление базой данных</h2>
+  <button id="fill-data">Заполнить тестовыми данными</button>
+  <button id="clear-data">Очистить все таблицы</button>
+  <button id="get-data">Получить все данные</button>
+  <br />
+  <label for="sql-query">Выполнить SQL запрос:</label><br />
+  <input type="text" id="sql-query" placeholder="Введите SQL-запрос" />
+  <button id="run-sql">Выполнить</button>
+  <pre id="output"></pre>
+
+  <script>
+    const output = document.getElementById('output');
+
+    async function fetchApi(path, method = 'GET', body = null) {
+      try {
+        const options = { method };
+        if (body) {
+          options.headers = { 'Content-Type': 'application/json' };
+          options.body = JSON.stringify(body);
+        }
+        const response = await fetch(path, options);
+        if (!response.ok) {
+          output.textContent = `Ошибка: ${response.status} ${response.statusText}`;
+          return null;
+        }
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        return data;
+      } catch (e) {
+        output.textContent = `Ошибка при запросе: ${e.message}`;
+        return null;
+      }
+    }
+
+    document.getElementById('fill-data').onclick = () => {
+      fetchApi('/api/fill_test_data');
+    };
+
+    document.getElementById('clear-data').onclick = () => {
+      fetchApi('/api/clear_all_tables');
+    };
+
+    document.getElementById('get-data').onclick = () => {
+      fetchApi('/api/get_all_data');
+    };
+
+    document.getElementById('run-sql').onclick = () => {
+      const sql = document.getElementById('sql-query').value.trim();
+      if (!sql) {
+        output.textContent = 'Пожалуйста, введите SQL-запрос';
+        return;
+      }
+      const method = sql.toLowerCase().startsWith('select') ? 'GET' : 'POST';
+      const url = method === 'GET'
+        ? `/api/get_sql?sql_query=${encodeURIComponent(sql)}`
+        : `/api/post_sql`;
+      const body = method === 'POST' ? { sql_query: sql } : null;
+      fetchApi(url, method, body);
+    };
+  </script>
+</body>
+</html>

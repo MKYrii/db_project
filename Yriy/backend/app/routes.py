@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from .database import engine
 from sqlalchemy import text
 from fastapi import APIRouter, Body
@@ -6,8 +9,8 @@ from datetime import datetime
 from typing import List, Optional
 from math import ceil
 
-
 router = APIRouter()
+
 
 @router.get('/fill_test_data')
 async def fill_test_data():
@@ -77,6 +80,7 @@ async def get_sql(sql_query: str):
         return {'message': 'Something went wrong: {}'.format(e)}
 
 
+     
 @router.get('/install_triggers')
 async def install_triggers():
     """Установка триггерных функций"""
