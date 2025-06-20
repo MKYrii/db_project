@@ -304,3 +304,32 @@ async def add_repair(car_id: int, description: str, date_time: datetime):
         return {'message': 'Repair added successfully'}
     except Exception as e:
         return {'message': f'Something went wrong: {str(e)}'}
+
+
+@router.post('/add_payment')
+async def add_payment(
+    description: str,
+    value: float,
+    date_: date,
+    deadline: date,
+    type_: str,
+    user_id: int
+):
+    try:
+        with engine.begin() as conn:
+            query = text("""
+                INSERT INTO Payment (description, "value", "date", deadline, type, user_id)
+                VALUES (:description, :value, :date, :deadline, :type, :user_id)
+            """)
+            conn.execute(query, {
+                "description": description,
+                "value": value,
+                "date": date_,
+                "deadline": deadline,
+                "type": type_,
+                "user_id": user_id
+            })
+            conn.commit()
+        return {'message': 'Payment added successfully'}
+    except Exception as e:
+        return {'message': f'Something went wrong: {str(e)}'}
