@@ -33,5 +33,5 @@ INSERT INTO Cars (mileage, licence, serial_number, buying_date, city, coordinate
 COMMIT;
 
 INSERT INTO Tariffs (price_per_minute, start_time, end_time, model_id) VALUES
-(30, '2023-01-01 00:00:00', '2023-12-31 23:59:59', 1),
-(10, '2023-01-01 00:00:00', '2023-12-31 23:59:59', 2);
+(30, '2023-01-01 00:00:00', '2026-12-31 23:59:59', 1),
+(10, '2023-01-01 00:00:00', '2026-12-31 23:59:59', 2);

@@ -8,6 +8,7 @@ from .services import get_tables
 from datetime import datetime
 from typing import List, Optional
 from math import ceil
+from datetime import date, timedelta
 
 router = APIRouter()
 
@@ -157,6 +158,7 @@ async def add_trip(
     Возвращает:
     - Сообщение об успешном добавлении или ошибку
     """
+    coords_query = text(f"SELECT coordinates FROM cars WHERE car_id = {car_id}")
 
     trip_query = text("""
         INSERT INTO Trip (start_time, end_time, problems, comments, car_id, user_id)
@@ -172,9 +174,29 @@ async def add_trip(
     if end_city:
         car_query = text("""
                 UPDATE Cars 
-                SET coordinates = :coordinates, city = :end_city
+                SET coordinates = :coordinates, city = :end_city, mileage = mileage + :distance
                 WHERE car_id = :car_id
             """)
+
+    payment_query = text("""
+        INSERT INTO Payment (description, value, date, deadline, type, user_id)
+        VALUES (
+            'оплата поездки',
+            (
+                SELECT t.price_per_minute * EXTRACT(EPOCH FROM (:end_time - :start_time)) / 60
+                FROM Cars c
+                JOIN Tariffs t ON t.model_id = c.model_id
+                WHERE c.car_id = :car_id
+                  AND t.start_time <= :start_time
+                  AND t.end_time >= :end_time
+                LIMIT 1
+            ),
+            :date,
+            :deadline,
+            'trip',
+            :user_id
+        )
+    """)
 
     try:
         with engine.begin() as conn:
@@ -189,15 +211,29 @@ async def add_trip(
                     "user_id": user_id
                 }
             )
+            prev_coords = float(conn.execute(coords_query).fetchall()[0][0])
 
             coordinates = float(end_coords[0])
+            dist = int(ceil(abs(prev_coords - coordinates) * 111))
             conn.execute(
                 car_query,
                 {
                     "coordinates": coordinates,
                     "car_id": car_id,
                     "end_city": end_city,
-                    "distance": 25
+                    "distance": dist
+                }
+            )
+
+            conn.execute(
+                payment_query,
+                {
+                    "start_time": start_time,
+                    "end_time": end_time,
+                    "car_id": car_id,
+                    "date": date.today(),
+                    "deadline": date.today() + timedelta(days=3),
+                    "user_id": user_id
                 }
             )
             conn.commit()
@@ -226,7 +262,7 @@ async def show_user_payments(user_id: int):
     try:
         with engine.begin() as conn:
             query = text("""
-            SELECT pay_id, description, 'value', 'date', deadline, type, user_id FROM Payment
+            SELECT pay_id, description, "value", "date", deadline, type, user_id FROM Payment
             WHERE user_id = :user_id;
             """)
             return str(conn.execute(query, {"user_id": user_id}).fetchall())
