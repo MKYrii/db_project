@@ -206,3 +206,65 @@ async def add_trip(
 
     except Exception as e:
         return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.get('/show_user_trips')
+async def show_user_trips(user_id: int):
+    try:
+        with engine.begin() as conn:
+            query = text("""
+            SELECT trip_id, start_time, end_time, problems, comments, car_id, user_id FROM Trip
+            WHERE user_id = :user_id;
+            """)
+            return str(conn.execute(query, {"user_id": user_id}).fetchall())
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.get('/show_user_payments')
+async def show_user_payments(user_id: int):
+    try:
+        with engine.begin() as conn:
+            query = text("""
+            SELECT pay_id, description, 'value', 'date', deadline, type, user_id FROM Payment
+            WHERE user_id = :user_id;
+            """)
+            return str(conn.execute(query, {"user_id": user_id}).fetchall())
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+@router.get('/show_car_repairs')
+async def show_car_repairs(car_id: int):
+    try:
+        with engine.begin() as conn:
+            query = text("""
+            SELECT repair_id, description, datetime, car_id FROM Repairs
+            WHERE car_id = :car_id;
+            """)
+            return str(conn.execute(query, {"car_id": car_id}).fetchall())
+    except Exception as e:
+        return {'message': 'Something went wrong: {}'.format(e)}
+
+
+from datetime import datetime
+from sqlalchemy import text  # Добавьте этот импорт
+
+
+@router.post('/add_repair')
+async def add_repair(car_id: int, description: str, date_time: datetime):
+    try:
+        with engine.begin() as conn:
+            query = text("""
+                INSERT INTO Repairs (car_id, description, datetime)
+                VALUES (:car_id, :description, :date_time)
+            """)
+            conn.execute(query, {
+                "car_id": car_id,
+                "description": description,
+                "date_time": date_time
+            })
+            conn.commit()
+        return {'message': 'Repair added successfully'}
+    except Exception as e:
+        return {'message': f'Something went wrong: {str(e)}'}
