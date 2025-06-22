@@ -2,40 +2,668 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Простой интерфейс к FastAPI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MySite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    button {
-      margin: 5px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FFFFFF;
+      color: #1E1E1E;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-bottom: 1px solid #D9D9D9;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1E1E1E;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    nav ul li a {
+      font-weight: 400;
+      font-size: 16px;
+      color: #1E1E1E;
+    }
+
+    nav ul li a:hover {
+      color: #0066CC;
+    }
+
+    .btn-started {
       padding: 10px 20px;
+      background-color: #E3E3E3;
+      border: 1px solid #767676;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
     }
-    pre {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f0f0f0;
-      white-space: pre-wrap;
-      max-height: 400px;
-      overflow: auto;
+
+    .btn-started:hover {
+      background-color: #0066CC;
+      color: white;
+      border-color: #0066CC;
     }
-    input[type="text"] {
+
+    /* Hero Section */
+  .hero {
+      background-image: url('https://sportishka.com/uploads/posts/2022-04/1651348444_1-sportishka-com-p-razmitaya-mashina-mashini-krasivo-foto-1.jpg');
+      background-size: cover;      /* Растягивает картинку на весь блок */
+      background-position: center; /* Центрирует картинку */
+      background-repeat: no-repeat;
+      padding: 78px 64px 174px;
+      text-align: center;
+      color: white; /* Чтобы текст был виден на фоне */
+    }
+
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      font-size: 32px;
+      font-weight: 400;
+      color: #D3D3D3;
+      line-height: 1.2;
+    }
+
+    /* Features Section */
+    .features-container {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 300px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      font-size: 20px;
+      font-weight: 400;
+      color: #757575;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 24px;
+      background-color: #FFFFFF;
+      border: 1px solid #D9D9D9;
+      border-radius: 8px;
+      gap: 24px;
+    }
+
+    .card-image {
+      width: 160px;
+      min-width: 160px;
+      height: 160px;
+      background-color: #E3E3E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .card-text {
+      font-size: 16px;
+      line-height: 1.4;
+      color: #757575;
+    }
+
+    .card-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+    }
+
+    .card-btn {
+      padding: 12px;
+      background-color: #E3E3E3;
+      border: 1px solid #767676;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 32px 160px;
+      border-top: 1px solid #D9D9D9;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-width: 240px;
+    }
+
+    .footer-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1E1E1E;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links strong {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .footer-links a {
+      font-size: 16px;
+      color: #1E1E1E;
+      opacity: 0.7;
+    }
+
+    .footer-links a:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .features-container,
+      .hero,
+      header {
+        padding: 24px;
+      }
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      border-radius: 8px;
       width: 80%;
+      max-width: 500px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
       padding: 8px;
-      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      height: 60px;
+      resize: vertical;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      background-color: #0066CC;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+
+    .form-group small {
+      display: block;
+      margin-top: 4px;
+      color: #666;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #0066CC;
+      box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
+    }
+
+    .form-group input:invalid,
+    .form-group textarea:invalid {
+      border-color: #dc3545;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+      color: #1E1E1E;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .btn-primary:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    /* Message log styles */
+    .message-log-container {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+
+    .message-log-container h3 {
+      margin-bottom: 15px;
+      color: #1E1E1E;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .message-log {
+      max-height: 300px;
+      overflow-y: auto;
+      background-color: white;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .message-log::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .message-log::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .message-log::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    .message-log::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 8px;
+      border-radius: 4px;
+      border-left: 4px solid #007bff;
+      background-color: #f8f9fa;
+    }
+
+    .log-entry.success {
+      border-left-color: #28a745;
+      background-color: #d4edda;
+    }
+
+    .log-entry.error {
+      border-left-color: #dc3545;
+      background-color: #f8d7da;
+    }
+
+    .log-entry.warning {
+      border-left-color: #ffc107;
+      background-color: #fff3cd;
+    }
+
+    .log-timestamp {
+      color: #6c757d;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .log-message {
+      color: #1E1E1E;
+      word-break: break-word;
+    }
+
+    .log-buttons {
+      margin-top: 10px;
+    }
+
+    .log-btn {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    .log-btn:hover {
+      opacity: 0.9;
+    }
+
+    .log-btn.export {
+      background-color: #28a745;
+    }
+
+    .log-btn.export:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
-  <h2>Управление базой данных</h2>
-  <button id="fill-data">Заполнить тестовыми данными</button>
-  <button id="clear-data">Очистить все таблицы</button>
-  <button id="get-data">Получить все данные</button>
-  <br />
+
+  <!-- Header -->
+  <header>
+    <div class="logo">CarTaker</div>
+    <nav>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Управление базой данных</h1>
+    <p>Проект каршеринга "CarTaker"</p>
+  </section>
+
+  <!-- Features -->
+  <section class="features-container">
+    <div class="section-header">
+      <h2>Каршеринг</h2>
+      <p>Выберите основные опции</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Заполнить тестовыми данными</h3>
+          <p class="card-text">Для примера можно заполнить таблицы готовыми данными</p>
+          <div class="card-buttons">
+            <button id="fill-data" class="card-btn">FILL</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Удаление</h3>
+          <p class="card-text">Удаление всех данных из таблиц</p>
+          <div class="card-buttons">
+            <button id="clear-data" class="card-btn">DELETE</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Добавить поездку</h3>
+          <p class="card-text">Создать новую поездку в системе</p>
+          <div class="card-buttons">
+            <button id="add-trip-btn" class="card-btn">Добавить поездку</button>
+            <button id="test-add-trip-btn" class="card-btn" style="background-color: #28a745; color: white;">Тест API</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
   <label for="sql-query">Выполнить SQL запрос:</label><br />
   <input type="text" id="sql-query" placeholder="Введите SQL-запрос" />
   <button id="run-sql">Выполнить</button>
   <pre id="output"></pre>
+  
+  <!-- Новое поле для сообщений от бэкенда -->
+  <div class="message-log-container">
+    <h3>Лог сообщений от бэкенда</h3>
+    <div id="message-log" class="message-log">
+      <div style="color: #6c757d; font-style: italic;">Сообщения будут отображаться здесь...</div>
+    </div>
+    <div class="log-buttons">
+      <button id="clear-log" class="log-btn">Очистить лог</button>
+      <button id="export-log" class="log-btn export">Экспорт лога</button>
+    </div>
+  </div>
+  </section>
+
+<!-- Выбор таблиц -->
+<div style="padding: 20px;">
+  <label><input type="checkbox" name="table" value="models" checked> Модели</label>
+  <label><input type="checkbox" name="table" value="cars" checked> Машины</label>
+  <label><input type="checkbox" name="table" value="users"> Пользователи</label>
+  <label><input type="checkbox" name="table" value="passport"> Паспорта</label>
+  <label><input type="checkbox" name="table" value="driver_license"> Водительские права</label>
+  <label><input type="checkbox" name="table" value="tariffs"> Тарифы</label>
+  <label><input type="checkbox" name="table" value="trip"> Поездки</label>
+  <br><br>
+  <strong>Специальные запросы:</strong><br>
+  <label><input type="checkbox" name="special_table" value="user_payments"> Платежи пользователя</label>
+  <input type="number" id="user_id_for_payments" placeholder="ID пользователя" style="width: 120px; margin-left: 10px;">
+  <br>
+  <label><input type="checkbox" name="special_table" value="car_repairs"> Ремонты автомобиля</label>
+  <input type="number" id="car_id_for_repairs" placeholder="ID автомобиля" style="width: 120px; margin-left: 10px;">
+  <br><br>
+  <button onclick="renderTables()">Показать</button>
+  <button onclick="testTableData()" style="background-color: #17a2b8; color: white; margin-left: 10px;">Тест данных</button>
+</div>
+
+<!-- Контейнер для таблиц -->
+<div id="tables-container" class="features-container"></div>
+
+<!-- Modal для добавления поездки -->
+<div id="addTripModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Добавить новую поездку</h2>
+    <form id="addTripForm">
+      <div class="form-group">
+        <label for="car_id">ID автомобиля *:</label>
+        <input type="number" id="car_id" name="car_id" required min="1" placeholder="Введите ID автомобиля">
+        <small style="color: #666; font-size: 12px;">Укажите существующий ID автомобиля из базы данных</small>
+      </div>
+      <div class="form-group">
+        <label for="user_id">ID пользователя *:</label>
+        <input type="number" id="user_id" name="user_id" required min="1" placeholder="Введите ID пользователя">
+        <small style="color: #666; font-size: 12px;">Укажите существующий ID пользователя из базы данных</small>
+      </div>
+      <div class="form-group">
+        <label for="start_time">Время начала *:</label>
+        <input type="datetime-local" id="start_time" name="start_time" required>
+        <small style="color: #666; font-size: 12px;">Выберите дату и время начала поездки</small>
+      </div>
+      <div class="form-group">
+        <label for="end_time">Время окончания *:</label>
+        <input type="datetime-local" id="end_time" name="end_time" required>
+        <small style="color: #666; font-size: 12px;">Выберите дату и время окончания поездки</small>
+      </div>
+      <div class="form-group">
+        <label for="end_coords">Координаты окончания:</label>
+        <input type="text" id="end_coords" name="end_coords" placeholder="55.7558,37.6176" pattern="^-?\d+\.?\d*,-?\d+\.?\d*$">
+        <small style="color: #666; font-size: 12px;">Формат: широта,долгота (например: 55.7558,37.6176)</small>
+      </div>
+      <div class="form-group">
+        <label for="end_city">Город окончания:</label>
+        <input type="text" id="end_city" name="end_city" placeholder="Москва">
+        <small style="color: #666; font-size: 12px;">Город, где закончилась поездка</small>
+      </div>
+      <div class="form-group">
+        <label for="problems">Проблемы:</label>
+        <textarea id="problems" name="problems" placeholder="Опишите проблемы, возникшие во время поездки (если были)"></textarea>
+        <small style="color: #666; font-size: 12px;">Необязательное поле для описания проблем</small>
+      </div>
+      <div class="form-group">
+        <label for="comments">Комментарии:</label>
+        <textarea id="comments" name="comments" placeholder="Дополнительные комментарии к поездке"></textarea>
+        <small style="color: #666; font-size: 12px;">Необязательное поле для дополнительной информации</small>
+      </div>
+      <div class="form-buttons">
+        <button type="button" class="btn-secondary" onclick="closeModal()">Отмена</button>
+        <button type="submit" class="btn-primary">Добавить поездку</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-column">
+      <div class="footer-logo">CarTaker</div>
+      <div class="footer-links">
+        <strong>Resources</strong>
+        <a href="#">Privacy Policy</a>
+      </div>
+    </div>
+    <div class="footer-column">
+      <div class="footer-links">
+        <strong>Support</strong>
+        <a href="https://github.com/MKYrii/db_project.git">Contact Us</a>
+      </div>
+    </div>
+    <div class="footer-column">
+      <div class="footer-links">
+        <strong>Company</strong>
+        <a href="https://itmo.ru/">About Us</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const output = document.getElementById('output');
+    const messageLog = document.getElementById('message-log');
 
     async function fetchApi(path, method = 'GET', body = null) {
       try {
@@ -44,45 +672,766 @@
           options.headers = { 'Content-Type': 'application/json' };
           options.body = JSON.stringify(body);
         }
+        
+        // Log the request
+        addLogMessage(`Запрос: ${method} ${path}`, 'info', 'API Request');
+        if (body) {
+          addLogMessage(body, 'info', 'Request Body');
+        }
+        
         const response = await fetch(path, options);
         if (!response.ok) {
-          output.textContent = `Ошибка: ${response.status} ${response.statusText}`;
+          const errorMsg = `Ошибка: ${response.status} ${response.statusText}`;
+          output.textContent = errorMsg;
+          addLogMessage(errorMsg, 'error', 'API Error');
           return null;
         }
         const data = await response.json();
         output.textContent = JSON.stringify(data, null, 2);
+        
+        // Log the response
+        addLogMessage(data, 'success', 'API Response');
         return data;
       } catch (e) {
-        output.textContent = `Ошибка при запросе: ${e.message}`;
+        const errorMsg = `Ошибка при запросе: ${e.message}`;
+        output.textContent = errorMsg;
+        addLogMessage(errorMsg, 'error', 'Network Error');
         return null;
       }
     }
 
-    document.getElementById('fill-data').onclick = () => {
-      fetchApi('/api/fill_test_data');
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, setting up event listeners...');
+      
+      // Button event listeners
+      const fillDataBtn = document.getElementById('fill-data');
+      const clearDataBtn = document.getElementById('clear-data');
+      const getDataBtn = document.getElementById('get-data');
+      const runSqlBtn = document.getElementById('run-sql');
+      const clearLogBtn = document.getElementById('clear-log');
+      const exportLogBtn = document.getElementById('export-log');
+      const addTripBtn = document.getElementById('add-trip-btn');
+      const testAddTripBtn = document.getElementById('test-add-trip-btn');
+      const modal = document.getElementById('addTripModal');
+      const closeBtn = document.querySelector('.close');
+      const addTripForm = document.getElementById('addTripForm');
 
-    document.getElementById('clear-data').onclick = () => {
-      fetchApi('/api/clear_all_tables');
-    };
+      // Debug logging
+      console.log('Elements found:', {
+        fillDataBtn: !!fillDataBtn,
+        clearDataBtn: !!clearDataBtn,
+        getDataBtn: !!getDataBtn,
+        runSqlBtn: !!runSqlBtn,
+        clearLogBtn: !!clearLogBtn,
+        exportLogBtn: !!exportLogBtn,
+        addTripBtn: !!addTripBtn,
+        testAddTripBtn: !!testAddTripBtn,
+        modal: !!modal,
+        closeBtn: !!closeBtn,
+        addTripForm: !!addTripForm
+      });
 
-    document.getElementById('get-data').onclick = () => {
-      fetchApi('/api/get_all_data');
-    };
+      if (fillDataBtn) {
+        fillDataBtn.onclick = () => {
+          addLogMessage('Заполнение тестовыми данными...', 'info', 'User Action');
+          fetchApi('/api/fill_test_data');
+        };
+      }
 
-    document.getElementById('run-sql').onclick = () => {
-      const sql = document.getElementById('sql-query').value.trim();
-      if (!sql) {
-        output.textContent = 'Пожалуйста, введите SQL-запрос';
+      if (clearDataBtn) {
+        clearDataBtn.onclick = () => {
+          addLogMessage('Очистка всех таблиц...', 'warning', 'User Action');
+          fetchApi('/api/clear_all_tables');
+        };
+      }
+
+      if (getDataBtn) {
+        getDataBtn.onclick = () => {
+          addLogMessage('Получение всех данных...', 'info', 'User Action');
+          fetchApiData('/api/get_all_data');
+        };
+      }
+
+      if (runSqlBtn) {
+        runSqlBtn.onclick = () => {
+          const sql = document.getElementById('sql-query').value.trim();
+          if (!sql) {
+            const errorMsg = 'Пожалуйста, введите SQL-запрос';
+            output.textContent = errorMsg;
+            addLogMessage(errorMsg, 'error', 'Validation Error');
+            return;
+          }
+          addLogMessage(`Выполнение SQL запроса: ${sql}`, 'info', 'User Action');
+          const method = sql.toLowerCase().startsWith('select') ? 'GET' : 'POST';
+          const url = method === 'GET'
+            ? `/api/get_sql?sql_query=${encodeURIComponent(sql)}`
+            : `/api/post_sql`;
+          const body = method === 'POST' ? { sql_query: sql } : null;
+          fetchApi(url, method, body);
+        };
+      }
+
+      // Log button event listeners
+      if (clearLogBtn) {
+        clearLogBtn.onclick = clearLog;
+      }
+      if (exportLogBtn) {
+        exportLogBtn.onclick = exportLog;
+      }
+
+      // Open modal
+      if (addTripBtn) {
+        addTripBtn.onclick = () => {
+          console.log('Add trip button clicked');
+          modal.style.display = 'block';
+          
+          // Set default datetime values
+          const now = new Date();
+          const startTime = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour ago
+          const endTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
+          
+          // Format datetime for input fields
+          const formatDateTime = (date) => {
+            return date.toISOString().slice(0, 16);
+          };
+          
+          document.getElementById('start_time').value = formatDateTime(startTime);
+          document.getElementById('end_time').value = formatDateTime(endTime);
+        };
+      }
+
+      // Close modal
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          closeModal();
+        };
+      }
+
+      // Close modal when clicking outside
+      window.onclick = (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+
+      function closeModal() {
+        modal.style.display = 'none';
+        addTripForm.reset();
+      }
+
+      // Handle form submission
+      if (addTripForm) {
+        addTripForm.onsubmit = async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData(addTripForm);
+          
+          // Validation
+          const car_id = parseInt(formData.get('car_id'));
+          const user_id = parseInt(formData.get('user_id'));
+          const start_time = formData.get('start_time');
+          const end_time = formData.get('end_time');
+          const end_coords = formData.get('end_coords');
+          
+          // Basic validation
+          if (!car_id || car_id < 1) {
+            output.textContent = 'Ошибка: ID автомобиля должен быть положительным числом';
+            addLogMessage('Ошибка: ID автомобиля должен быть положительным числом', 'error', 'Validation Error');
+            return;
+          }
+          
+          if (!user_id || user_id < 1) {
+            output.textContent = 'Ошибка: ID пользователя должен быть положительным числом';
+            addLogMessage('Ошибка: ID пользователя должен быть положительным числом', 'error', 'Validation Error');
+            return;
+          }
+          
+          if (!start_time) {
+            output.textContent = 'Ошибка: Укажите время начала поездки';
+            addLogMessage('Ошибка: Укажите время начала поездки', 'error', 'Validation Error');
+            return;
+          }
+          
+          if (!end_time) {
+            output.textContent = 'Ошибка: Укажите время окончания поездки';
+            addLogMessage('Ошибка: Укажите время окончания поездки', 'error', 'Validation Error');
+            return;
+          }
+          
+          if (new Date(start_time) >= new Date(end_time)) {
+            output.textContent = 'Ошибка: Время окончания должно быть позже времени начала';
+            addLogMessage('Ошибка: Время окончания должно быть позже времени начала', 'error', 'Validation Error');
+            return;
+          }
+          
+          // Validate coordinates format if provided
+          if (end_coords && !end_coords.match(/^-?\d+\.?\d*,-?\d+\.?\d*$/)) {
+            output.textContent = 'Ошибка: Неверный формат координат. Используйте формат: широта,долгота';
+            addLogMessage('Ошибка: Неверный формат координат', 'error', 'Validation Error');
+            return;
+          }
+          
+          // Format datetime for backend (ISO format)
+          const formatDateTimeForBackend = (dateTimeString) => {
+            const date = new Date(dateTimeString);
+            return date.toISOString().replace('T', ' ').replace('Z', '');
+          };
+          
+          const params = new URLSearchParams({
+            car_id: car_id.toString(),
+            user_id: user_id.toString(),
+            start_time: formatDateTimeForBackend(start_time),
+            end_time: formatDateTimeForBackend(end_time)
+          });
+
+          // Add optional parameters only if they have values
+          if (end_coords && end_coords.trim()) {
+            params.append('end_coords', end_coords.trim());
+          }
+          if (formData.get('end_city') && formData.get('end_city').trim()) {
+            params.append('end_city', formData.get('end_city').trim());
+          }
+          if (formData.get('problems') && formData.get('problems').trim()) {
+            params.append('problems', formData.get('problems').trim());
+          }
+          if (formData.get('comments') && formData.get('comments').trim()) {
+            params.append('comments', formData.get('comments').trim());
+          }
+
+          // Show loading message
+          output.textContent = 'Добавление поездки...';
+          addLogMessage('Добавление новой поездки...', 'info', 'Form Submission');
+          addLogMessage(`Параметры: ${params.toString()}`, 'info', 'Request Parameters');
+
+          try {
+            const url = `/api/add_trip?${params.toString()}`;
+            addLogMessage(`Отправка запроса на: ${url}`, 'info', 'Request URL');
+            
+            const response = await fetch(url, {
+              method: 'POST'
+            });
+
+            addLogMessage(`Получен ответ: ${response.status} ${response.statusText}`, 'info', 'Response Status');
+
+            let result;
+            const responseText = await response.text();
+            
+            try {
+              result = JSON.parse(responseText);
+              addLogMessage(`Ответ успешно распарсен как JSON`, 'info', 'Response Parsed');
+            } catch (parseError) {
+              // If response is not JSON, treat it as plain text
+              result = { message: responseText };
+              addLogMessage(`Response parsing error: ${parseError.message}`, 'warning', 'Parse Error');
+              addLogMessage(`Raw response: ${responseText}`, 'info', 'Raw Response');
+            }
+            
+            output.textContent = JSON.stringify(result, null, 2);
+            
+            if (response.ok) {
+              addLogMessage(result, 'success', 'Trip Added Successfully');
+              addLogMessage('Поездка успешно добавлена в базу данных', 'success', 'Database Updated');
+              closeModal();
+              // Refresh tables if they are displayed
+              if (document.getElementById('tables-container').children.length > 0) {
+                addLogMessage('Обновление отображения таблиц...', 'info', 'Refreshing Tables');
+                renderTables();
+              }
+            } else {
+              addLogMessage(result, 'error', 'Trip Addition Failed');
+              addLogMessage(`HTTP Error: ${response.status} - ${response.statusText}`, 'error', 'HTTP Error');
+            }
+          } catch (error) {
+            const errorMsg = `Ошибка при добавлении поездки: ${error.message}`;
+            output.textContent = errorMsg;
+            addLogMessage(errorMsg, 'error', 'Network Error');
+            addLogMessage(`Stack trace: ${error.stack}`, 'error', 'Error Details');
+          }
+        };
+      }
+      
+      console.log('Event listeners setup complete');
+    });
+
+    // Message log functionality
+    function addLogMessage(message, type = 'info', action = '') {
+      const timestamp = new Date().toLocaleString('ru-RU');
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      
+      const timestampDiv = document.createElement('div');
+      timestampDiv.className = 'log-timestamp';
+      timestampDiv.textContent = `[${timestamp}] ${action}`;
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'log-message';
+      
+      if (typeof message === 'object') {
+        messageDiv.textContent = JSON.stringify(message, null, 2);
+      } else {
+        messageDiv.textContent = message;
+      }
+      
+      logEntry.appendChild(timestampDiv);
+      logEntry.appendChild(messageDiv);
+      
+      // Remove placeholder message if it exists
+      const placeholder = messageLog.querySelector('div[style*="italic"]');
+      if (placeholder) {
+        placeholder.remove();
+      }
+      
+      messageLog.appendChild(logEntry);
+      messageLog.scrollTop = messageLog.scrollHeight;
+    }
+
+    function clearLog() {
+      messageLog.innerHTML = '<div style="color: #6c757d; font-style: italic;">Сообщения будут отображаться здесь...</div>';
+    }
+
+    function exportLog() {
+      const entries = messageLog.querySelectorAll('.log-entry');
+      if (entries.length === 0) {
+        alert('Лог пуст');
         return;
       }
-      const method = sql.toLowerCase().startsWith('select') ? 'GET' : 'POST';
-      const url = method === 'GET'
-        ? `/api/get_sql?sql_query=${encodeURIComponent(sql)}`
-        : `/api/post_sql`;
-      const body = method === 'POST' ? { sql_query: sql } : null;
-      fetchApi(url, method, body);
-    };
+      
+      let logText = 'Лог сообщений от бэкенда\n';
+      logText += '='.repeat(50) + '\n\n';
+      
+      entries.forEach(entry => {
+        const timestamp = entry.querySelector('.log-timestamp').textContent;
+        const message = entry.querySelector('.log-message').textContent;
+        logText += `${timestamp}\n${message}\n\n`;
+      });
+      
+      const blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backend-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Add welcome message when page loads
+    window.addEventListener('load', () => {
+      addLogMessage('Система управления базой данных CarTaker готова к работе', 'success', 'System Ready');
+    });
+
+    // Test add trip function
+    if (testAddTripBtn) {
+      testAddTripBtn.onclick = async () => {
+        addLogMessage('Тестирование функции добавления поездки...', 'info', 'Test Function');
+        
+        // Sample test data
+        const testParams = new URLSearchParams({
+          car_id: '1',
+          user_id: '1',
+          start_time: new Date(Date.now() - 60 * 60 * 1000).toISOString().replace('T', ' ').replace('Z', ''),
+          end_time: new Date().toISOString().replace('T', ' ').replace('Z', ''),
+          end_coords: '55.7558,37.6176',
+          end_city: 'Москва',
+          problems: 'Тестовая поездка',
+          comments: 'Создано через тестовую функцию'
+        });
+        
+        addLogMessage(`Тестовые параметры: ${testParams.toString()}`, 'info', 'Test Parameters');
+        
+        try {
+          const url = `/api/add_trip?${testParams.toString()}`;
+          addLogMessage(`Тестовый запрос на: ${url}`, 'info', 'Test Request');
+          
+          const response = await fetch(url, {
+            method: 'POST'
+          });
+          
+          addLogMessage(`Тестовый ответ: ${response.status} ${response.statusText}`, 'info', 'Test Response');
+          
+          const responseText = await response.text();
+          let result;
+          
+          try {
+            result = JSON.parse(responseText);
+            addLogMessage(`Тестовый ответ успешно распарсен`, 'success', 'Test Success');
+          } catch (parseError) {
+            result = { message: responseText };
+            addLogMessage(`Ошибка парсинга тестового ответа: ${parseError.message}`, 'warning', 'Test Parse Error');
+          }
+          
+          output.textContent = JSON.stringify(result, null, 2);
+          
+          if (response.ok) {
+            addLogMessage(result, 'success', 'Test Trip Added');
+            addLogMessage('Тестовая поездка успешно добавлена в базу данных', 'success', 'Test Database Updated');
+          } else {
+            addLogMessage(result, 'error', 'Test Trip Addition Failed');
+          }
+        } catch (error) {
+          const errorMsg = `Ошибка при тестировании: ${error.message}`;
+          output.textContent = errorMsg;
+          addLogMessage(errorMsg, 'error', 'Test Error');
+        }
+      };
+    }
   </script>
+
+<script>
+  // Парсер SQL-like строк
+  function parseSQLLikeArray(str) {
+    if (!str || str === "[]" || str.trim() === "") {
+      console.log('Empty or null data received');
+      return [];
+    }
+
+    try {
+      // If it's already an array, return it
+      if (Array.isArray(str)) {
+        return str;
+      }
+
+      // If it's a JSON string, try to parse it
+      if (typeof str === 'string' && str.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(str);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch (e) {
+          console.log('Not a valid JSON array, trying SQL-like parsing');
+        }
+      }
+
+      // SQL-like string parsing
+      const cleanedStr = str.trim();
+      console.log('Parsing string:', cleanedStr.substring(0, 200) + '...');
+      
+      // Handle different formats
+      if (cleanedStr === "[]" || cleanedStr === "()") {
+        return [];
+      }
+      
+      // Remove outer parentheses if they exist
+      let dataStr = cleanedStr;
+      if (cleanedStr.startsWith('(') && cleanedStr.endsWith(')')) {
+        dataStr = cleanedStr.slice(1, -1);
+      }
+      
+      // Split by records
+      const records = dataStr.split("),(");
+      
+      return records.map(record => {
+        const cleanedRecord = record.trim().replace(/^\(|\)$/g, "");
+        const fields = cleanedRecord.split(",");
+        
+        return fields.map(field => {
+          const trimmedField = field.trim();
+          // Remove quotes and handle null values
+          if (trimmedField === "null" || trimmedField === "NULL" || trimmedField === "None") {
+            return "";
+          }
+          // Remove single and double quotes
+          return trimmedField.replace(/^'(.*)'$/g, "$1").replace(/^"(.*)"$/g, "$1");
+        });
+      });
+    } catch (error) {
+      console.error('Error parsing data:', error, 'Data:', str);
+      addLogMessage(`Ошибка парсинга данных: ${error.message}`, 'error', 'Parse Error');
+      return [];
+    }
+  }
+
+  // Создание таблицы
+  function createTable(name, headers, rows) {
+    const container = document.createElement('div');
+    container.className = 'card';
+    container.style.width = '100%';
+
+    const title = document.createElement('h3');
+    title.textContent = name;
+    title.style.marginBottom = '10px';
+    container.appendChild(title);
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.textAlign = 'left';
+
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+
+    headers.forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      th.style.border = '1px solid #ccc';
+      th.style.padding = '8px';
+      trHead.appendChild(th);
+    });
+
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      row.forEach(cell => {
+        const td = document.createElement('td');
+        td.textContent = cell;
+        td.style.border = '1px solid #ccc';
+        td.style.padding = '6px';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    return container;
+  }
+
+  // Function to find table name regardless of case
+  function findTableName(data, targetName) {
+    const availableTables = Object.keys(data);
+    const targetLower = targetName.toLowerCase();
+    
+    // Exact match
+    if (availableTables.includes(targetName)) {
+      return targetName;
+    }
+    
+    // Case-insensitive match
+    for (const table of availableTables) {
+      if (table.toLowerCase() === targetLower) {
+        return table;
+      }
+    }
+    
+    // Partial match (for cases like 'driver_license' vs 'driverlicenses')
+    for (const table of availableTables) {
+      if (table.toLowerCase().includes(targetLower) || targetLower.includes(table.toLowerCase())) {
+        return table;
+      }
+    }
+    
+    return null;
+  }
+
+  // Debug function to analyze data structure
+  function debugDataStructure(data) {
+    console.log('=== DEBUG: Data Structure Analysis ===');
+    console.log('Data type:', typeof data);
+    console.log('Available keys:', Object.keys(data));
+    
+    Object.keys(data).forEach(key => {
+      const value = data[key];
+      console.log(`\nTable: ${key}`);
+      console.log('Type:', typeof value);
+      console.log('Value:', value);
+      if (typeof value === 'string') {
+        console.log('Length:', value.length);
+        console.log('First 200 chars:', value.substring(0, 200));
+      }
+    });
+    console.log('=== END DEBUG ===');
+  }
+
+  // Основная функция для загрузки и отображения данных
+  async function renderTables() {
+    const container = document.getElementById('tables-container');
+    container.innerHTML = '<p>Загрузка данных...</p>';
+    addLogMessage('Загрузка данных для отображения таблиц...', 'info', 'Table Render');
+
+    try {
+      const res = await fetch('/api/get_all_data');
+      const data = await res.json();
+
+      // Debug: Log available table names and analyze data structure
+      console.log('Available tables:', Object.keys(data));
+      debugDataStructure(data);
+      addLogMessage(`Доступные таблицы: ${Object.keys(data).join(', ')}`, 'info', 'Available Tables');
+
+      container.innerHTML = ''; // Очистить предыдущие таблицы
+
+      const checkboxes = document.querySelectorAll('input[name="table"]:checked');
+      const specialCheckboxes = document.querySelectorAll('input[name="special_table"]:checked');
+
+      // Process regular tables
+      checkboxes.forEach(cb => {
+        const tableName = cb.value;
+        let headers = [];
+        let parsedData = [];
+        let actualTableName = tableName;
+
+        // Map frontend table names to actual database table names
+        switch (tableName) {
+          case 'models':
+            actualTableName = 'models';
+            headers = ['ID', 'Производитель', 'Модель', 'Мощность'];
+            break;
+          case 'cars':
+            actualTableName = 'cars';
+            headers = ['ID', 'Пробег', 'Гос. номер', 'VIN', 'Дата покупки', 'Город', 'Координаты', 'Неисправности', 'Модель ID'];
+            break;
+          case 'users':
+            actualTableName = 'users';
+            headers = ['ID', 'Имя пользователя'];
+            break;
+          case 'passport':
+            actualTableName = 'passport';
+            headers = ['ID', 'Номер паспорта', 'Серия', 'Дата рождения', 'Пользователь ID'];
+            break;
+          case 'driver_license':
+            actualTableName = 'driver_license';
+            headers = ['ID', 'Дата выдачи', 'Дата окончания', 'Пользователь ID'];
+            break;
+          case 'tariffs':
+            actualTableName = 'tariffs';
+            headers = ['ID', 'Цена за минуту', 'Время начала', 'Время окончания', 'Модель ID'];
+            break;
+          case 'trip':
+            actualTableName = 'trip';
+            headers = ['ID', 'Время начала', 'Время окончания', 'Проблемы', 'Комментарии', 'Автомобиль ID', 'Пользователь ID'];
+            break;
+          default:
+            actualTableName = tableName;
+            headers = [];
+        }
+
+        // Try to get data from the actual table name
+        const foundTableName = findTableName(data, actualTableName);
+        if (foundTableName) {
+          parsedData = parseSQLLikeArray(data[foundTableName]);
+          addLogMessage(`Данные для таблицы ${tableName} (найдена как ${foundTableName}): ${parsedData.length} записей`, 'info', 'Data Found');
+        } else {
+          addLogMessage(`Таблица ${tableName} (${actualTableName}) не найдена в данных`, 'warning', 'Table Not Found');
+          console.log(`Table ${tableName} (${actualTableName}) not found. Available tables:`, Object.keys(data));
+        }
+
+        if (parsedData.length > 0) {
+          const table = createTable(tableName, headers, parsedData);
+          container.appendChild(table);
+          addLogMessage(`Таблица ${tableName} успешно отображена`, 'success', 'Table Displayed');
+        } else {
+          console.log(`No data found for table: ${tableName} (tried: ${actualTableName})`);
+          addLogMessage(`Нет данных для таблицы: ${tableName}`, 'warning', 'No Data');
+          
+          // Show empty table with headers for debugging
+          if (headers.length > 0) {
+            const emptyTable = createTable(`${tableName} (пустая)`, headers, []);
+            container.appendChild(emptyTable);
+          }
+        }
+      });
+
+      // Process special tables that require parameters
+      for (const cb of specialCheckboxes) {
+        const tableName = cb.value;
+        
+        if (tableName === 'user_payments') {
+          const userId = document.getElementById('user_id_for_payments').value;
+          if (!userId) {
+            addLogMessage('Для отображения платежей пользователя необходимо указать ID пользователя', 'warning', 'Missing Parameter');
+            continue;
+          }
+          
+          try {
+            addLogMessage(`Загрузка платежей для пользователя ID: ${userId}`, 'info', 'Loading User Payments');
+            const response = await fetch(`/api/show_user_payments?user_id=${userId}`);
+            const result = await response.text();
+            
+            let parsedData = parseSQLLikeArray(result);
+            const headers = ['ID', 'Описание', 'Сумма', 'Дата', 'Срок', 'Тип', 'Пользователь ID'];
+            
+            if (parsedData.length > 0) {
+              const table = createTable(`Платежи пользователя (ID: ${userId})`, headers, parsedData);
+              container.appendChild(table);
+              addLogMessage(`Загружено ${parsedData.length} платежей для пользователя ${userId}`, 'success', 'User Payments Loaded');
+            } else {
+              addLogMessage(`Нет платежей для пользователя с ID: ${userId}`, 'info', 'No User Payments');
+            }
+          } catch (error) {
+            addLogMessage(`Ошибка при загрузке платежей пользователя: ${error.message}`, 'error', 'User Payments Error');
+          }
+        }
+        
+        else if (tableName === 'car_repairs') {
+          const carId = document.getElementById('car_id_for_repairs').value;
+          if (!carId) {
+            addLogMessage('Для отображения ремонтов автомобиля необходимо указать ID автомобиля', 'warning', 'Missing Parameter');
+            continue;
+          }
+          
+          try {
+            addLogMessage(`Загрузка ремонтов для автомобиля ID: ${carId}`, 'info', 'Loading Car Repairs');
+            const response = await fetch(`/api/show_car_repairs?car_id=${carId}`);
+            const result = await response.text();
+            
+            let parsedData = parseSQLLikeArray(result);
+            const headers = ['ID', 'Описание', 'Дата/время', 'Автомобиль ID'];
+            
+            if (parsedData.length > 0) {
+              const table = createTable(`Ремонты автомобиля (ID: ${carId})`, headers, parsedData);
+              container.appendChild(table);
+              addLogMessage(`Загружено ${parsedData.length} ремонтов для автомобиля ${carId}`, 'success', 'Car Repairs Loaded');
+            } else {
+              addLogMessage(`Нет ремонтов для автомобиля с ID: ${carId}`, 'info', 'No Car Repairs');
+            }
+          } catch (error) {
+            addLogMessage(`Ошибка при загрузке ремонтов автомобиля: ${error.message}`, 'error', 'Car Repairs Error');
+          }
+        }
+      }
+
+      const totalTables = checkboxes.length + specialCheckboxes.length;
+      addLogMessage(`Таблицы успешно отображены. Загружено ${totalTables} таблиц.`, 'success', 'Table Render Complete');
+
+    } catch (error) {
+      console.error('Ошибка:', error);
+      container.innerHTML = '<p>Не удалось загрузить данные</p>';
+      addLogMessage(`Ошибка при загрузке таблиц: ${error.message}`, 'error', 'Table Render Error');
+    }
+  }
+
+  // Test function to debug table data
+  async function testTableData() {
+    addLogMessage('=== ТЕСТ ДАННЫХ ТАБЛИЦ ===', 'info', 'Test Start');
+    
+    try {
+      const res = await fetch('/api/get_all_data');
+      const data = await res.json();
+      
+      addLogMessage(`Получено ${Object.keys(data).length} таблиц`, 'info', 'Tables Count');
+      
+      Object.keys(data).forEach(tableName => {
+        const tableData = data[tableName];
+        addLogMessage(`Таблица: ${tableName}`, 'info', 'Table Name');
+        addLogMessage(`Тип данных: ${typeof tableData}`, 'info', 'Data Type');
+        addLogMessage(`Длина: ${tableData ? tableData.length : 'N/A'}`, 'info', 'Data Length');
+        
+        if (typeof tableData === 'string') {
+          addLogMessage(`Первые 200 символов: ${tableData.substring(0, 200)}`, 'info', 'Data Preview');
+          
+          // Try to parse the data
+          const parsed = parseSQLLikeArray(tableData);
+          addLogMessage(`Парсинг: ${parsed.length} записей`, 'info', 'Parse Result');
+          
+          if (parsed.length > 0) {
+            addLogMessage(`Первая запись: ${JSON.stringify(parsed[0])}`, 'info', 'First Record');
+          }
+        }
+        
+        addLogMessage('---', 'info', 'Separator');
+      });
+      
+    } catch (error) {
+      addLogMessage(`Ошибка тестирования: ${error.message}`, 'error', 'Test Error');
+    }
+  }
+</script>
+
 </body>
 </html>
