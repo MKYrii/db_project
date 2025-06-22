@@ -170,7 +170,16 @@ async def add_trip(
         SET coordinates = :coordinates, mileage = mileage + :distance 
         WHERE car_id = :car_id
     """)
-    end_coords = list(map(float, end_coords.split(',')))
+    
+    # Handle end_coords properly
+    coordinates = None
+    if end_coords:
+        try:
+            coords_list = list(map(float, end_coords.split(',')))
+            coordinates = coords_list[0] if coords_list else None
+        except (ValueError, AttributeError):
+            coordinates = None
+    
     if end_city:
         car_query = text("""
                 UPDATE Cars 
@@ -213,17 +222,32 @@ async def add_trip(
             )
             prev_coords = float(conn.execute(coords_query).fetchall()[0][0])
 
-            coordinates = float(end_coords[0])
-            dist = int(ceil(abs(prev_coords - coordinates) * 111))
-            conn.execute(
-                car_query,
-                {
-                    "coordinates": coordinates,
-                    "car_id": car_id,
-                    "end_city": end_city,
-                    "distance": dist
-                }
-            )
+            dist = int(ceil(abs(prev_coords - coordinates) * 111)) if coordinates is not None else 0
+            
+            # Only update coordinates if we have new coordinates
+            if coordinates is not None:
+                conn.execute(
+                    car_query,
+                    {
+                        "coordinates": coordinates,
+                        "car_id": car_id,
+                        "end_city": end_city,
+                        "distance": dist
+                    }
+                )
+            else:
+                # Update without coordinates
+                conn.execute(
+                    text("""
+                        UPDATE Cars 
+                        SET mileage = mileage + :distance 
+                        WHERE car_id = :car_id
+                    """),
+                    {
+                        "car_id": car_id,
+                        "distance": dist
+                    }
+                )
 
             conn.execute(
                 payment_query,
