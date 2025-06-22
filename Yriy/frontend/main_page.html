@@ -1083,6 +1083,11 @@
 <script>
   // Парсер SQL-like строк для нового формата данных
   function parseSQLLikeArray(str) {
+    console.log('=== PARSE DEBUG ===');
+    console.log('Input string:', str);
+    console.log('Input type:', typeof str);
+    console.log('Input length:', str ? str.length : 'N/A');
+    
     if (!str || str === "[]" || str.trim() === "") {
       console.log('Empty or null data received');
       return [];
@@ -1175,7 +1180,7 @@
         
         console.log(`Record ${index} fields:`, fields);
         
-        return fields.map(field => {
+        return fields.map((field, fieldIndex) => {
           const trimmedField = field.trim();
           
           // Handle null values
@@ -1216,6 +1221,7 @@
       });
       
       console.log('Final parsed result:', result);
+      console.log('=== END PARSE DEBUG ===');
       return result;
       
     } catch (error) {
@@ -1425,7 +1431,24 @@
             const response = await fetch(`/api/show_user_payments?user_id=${userId}`);
             const result = await response.text();
             
-            let parsedData = parseSQLLikeArray(result);
+            // Debug: Log the raw response
+            console.log('Raw response for user payments:', result);
+            addLogMessage(`Сырой ответ: ${result}`, 'info', 'Raw Response');
+            
+            // Parse JSON first, then parse the SQL-like string
+            let dataToParse = result;
+            try {
+              const jsonParsed = JSON.parse(result);
+              dataToParse = jsonParsed;
+              console.log('JSON parsed:', jsonParsed);
+            } catch (e) {
+              console.log('Not JSON, using as string');
+            }
+            
+            let parsedData = parseSQLLikeArray(dataToParse);
+            console.log('Parsed data for user payments:', parsedData);
+            addLogMessage(`Парсинг данных: ${JSON.stringify(parsedData)}`, 'info', 'Parsed Data');
+            
             const headers = ['ID', 'Описание', 'Сумма', 'Дата', 'Срок', 'Тип', 'Пользователь ID'];
             
             if (parsedData.length > 0) {
