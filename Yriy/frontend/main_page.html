@@ -1081,7 +1081,7 @@
   </script>
 
 <script>
-  // Парсер SQL-like строк
+  // Парсер SQL-like строк для нового формата данных
   function parseSQLLikeArray(str) {
     if (!str || str === "[]" || str.trim() === "") {
       console.log('Empty or null data received');
@@ -1106,38 +1106,118 @@
         }
       }
 
-      // SQL-like string parsing
+      // SQL-like string parsing for new format
       const cleanedStr = str.trim();
-      console.log('Parsing string:', cleanedStr.substring(0, 200) + '...');
+      console.log('Parsing string:', cleanedStr);
       
-      // Handle different formats
+      // Handle empty arrays
       if (cleanedStr === "[]" || cleanedStr === "()") {
         return [];
       }
       
-      // Remove outer parentheses if they exist
+      // Remove outer brackets
       let dataStr = cleanedStr;
-      if (cleanedStr.startsWith('(') && cleanedStr.endsWith(')')) {
+      if (cleanedStr.startsWith('[') && cleanedStr.endsWith(']')) {
         dataStr = cleanedStr.slice(1, -1);
       }
       
-      // Split by records
-      const records = dataStr.split("),(");
+      // Split by "), (" to get individual tuples
+      const records = dataStr.split("), (");
+      console.log('Split records:', records);
       
-      return records.map(record => {
-        const cleanedRecord = record.trim().replace(/^\(|\)$/g, "");
-        const fields = cleanedRecord.split(",");
+      const result = records.map((record, index) => {
+        // Clean the record - remove outer parentheses
+        let cleanedRecord = record.trim();
+        if (cleanedRecord.startsWith('(')) {
+          cleanedRecord = cleanedRecord.slice(1);
+        }
+        if (cleanedRecord.endsWith(')')) {
+          cleanedRecord = cleanedRecord.slice(0, -1);
+        }
+        
+        console.log(`Processing record ${index}:`, cleanedRecord);
+        
+        // Split by comma, but handle quoted strings and nested structures
+        const fields = [];
+        let currentField = '';
+        let inQuotes = false;
+        let quoteChar = '';
+        let parenCount = 0;
+        
+        for (let i = 0; i < cleanedRecord.length; i++) {
+          const char = cleanedRecord[i];
+          
+          if (!inQuotes && (char === "'" || char === '"')) {
+            inQuotes = true;
+            quoteChar = char;
+            currentField += char;
+          } else if (inQuotes && char === quoteChar) {
+            inQuotes = false;
+            currentField += char;
+          } else if (!inQuotes && char === '(') {
+            parenCount++;
+            currentField += char;
+          } else if (!inQuotes && char === ')') {
+            parenCount--;
+            currentField += char;
+          } else if (!inQuotes && parenCount === 0 && char === ',') {
+            fields.push(currentField.trim());
+            currentField = '';
+          } else {
+            currentField += char;
+          }
+        }
+        
+        // Add the last field
+        if (currentField.trim()) {
+          fields.push(currentField.trim());
+        }
+        
+        console.log(`Record ${index} fields:`, fields);
         
         return fields.map(field => {
           const trimmedField = field.trim();
-          // Remove quotes and handle null values
+          
+          // Handle null values
           if (trimmedField === "null" || trimmedField === "NULL" || trimmedField === "None") {
             return "";
           }
+          
+          // Handle datetime objects
+          if (trimmedField.includes('datetime.datetime') || trimmedField.includes('datetime.date')) {
+            // Extract the date part from datetime objects
+            const match = trimmedField.match(/(\d{4}),\s*(\d{1,2}),\s*(\d{1,2})(?:,\s*(\d{1,2}),\s*(\d{1,2})(?:,\s*(\d{1,2}))?)?/);
+            if (match) {
+              const year = match[1];
+              const month = match[2].padStart(2, '0');
+              const day = match[3].padStart(2, '0');
+              const hour = match[4] ? match[4].padStart(2, '0') : '00';
+              const minute = match[5] ? match[5].padStart(2, '0') : '00';
+              const second = match[6] ? match[6].padStart(2, '0') : '00';
+              
+              if (match[4] && match[5]) {
+                // Full datetime with seconds
+                if (match[6]) {
+                  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+                } else {
+                  // Full datetime without seconds
+                  return `${year}-${month}-${day} ${hour}:${minute}`;
+                }
+              } else {
+                // Date only
+                return `${year}-${month}-${day}`;
+              }
+            }
+          }
+          
           // Remove single and double quotes
           return trimmedField.replace(/^'(.*)'$/g, "$1").replace(/^"(.*)"$/g, "$1");
         });
       });
+      
+      console.log('Final parsed result:', result);
+      return result;
+      
     } catch (error) {
       console.error('Error parsing data:', error, 'Data:', str);
       addLogMessage(`Ошибка парсинга данных: ${error.message}`, 'error', 'Parse Error');
