@@ -503,3 +503,88 @@ async def add_model(
         return {'message': 'Модель успешно добавлена'}
     except Exception as e:
         return {'message': f'Ошибка при добавлении модели: {str(e)}'}
+
+
+@router.delete('/delete_user')
+async def delete_user(user_id: int):
+    """
+    Удаляет пользователя, а также его паспорт и водительские права.
+    """
+    try:
+        with engine.begin() as conn:
+            # Удаляем паспорт
+            conn.execute(text("DELETE FROM Passport WHERE user_id = :user_id"), {"user_id": user_id})
+            # Удаляем водительские права
+            conn.execute(text("DELETE FROM Driver_license WHERE user_id = :user_id"), {"user_id": user_id})
+            # Удаляем пользователя
+            result = conn.execute(text("DELETE FROM Users WHERE user_id = :user_id"), {"user_id": user_id})
+            conn.commit()
+            if result.rowcount == 0:
+                return {'message': f'Пользователь с id {user_id} не найден'}
+        return {'message': 'Пользователь, паспорт и водительские права успешно удалены'}
+    except Exception as e:
+        return {'message': f'Ошибка при удалении пользователя: {str(e)}'}
+
+
+@router.delete('/delete_passport')
+async def delete_passport(passport_id: int):
+    """
+    Удаляет паспорт по passport_id.
+    """
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text("DELETE FROM Passport WHERE passport_id = :passport_id"), {"passport_id": passport_id})
+            conn.commit()
+            if result.rowcount == 0:
+                return {'message': f'Паспорт с id {passport_id} не найден'}
+        return {'message': 'Паспорт успешно удалён'}
+    except Exception as e:
+        return {'message': f'Ошибка при удалении паспорта: {str(e)}'}
+
+
+@router.delete('/delete_car')
+async def delete_car(car_id: int):
+    """
+    Удаляет машину по car_id.
+    """
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text("DELETE FROM Cars WHERE car_id = :car_id"), {"car_id": car_id})
+            conn.commit()
+            if result.rowcount == 0:
+                return {'message': f'Машина с id {car_id} не найдена'}
+        return {'message': 'Машина успешно удалена'}
+    except Exception as e:
+        return {'message': f'Ошибка при удалении машины: {str(e)}'}
+
+
+@router.delete('/delete_driver_license')
+async def delete_driver_license(license_id: int):
+    """
+    Удаляет водительские права по license_id.
+    """
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text("DELETE FROM Driver_license WHERE license_id = :license_id"), {"license_id": license_id})
+            conn.commit()
+            if result.rowcount == 0:
+                return {'message': f'Водительские права с id {license_id} не найдены'}
+        return {'message': 'Водительские права успешно удалены'}
+    except Exception as e:
+        return {'message': f'Ошибка при удалении водительских прав: {str(e)}'}
+
+
+@router.delete('/delete_model')
+async def delete_model(model_id: int):
+    """
+    Удаляет модель по model_id.
+    """
+    try:
+        with engine.begin() as conn:
+            result = conn.execute(text("DELETE FROM Models WHERE model_id = :model_id"), {"model_id": model_id})
+            conn.commit()
+            if result.rowcount == 0:
+                return {'message': f'Модель с id {model_id} не найдена'}
+        return {'message': 'Модель успешно удалена'}
+    except Exception as e:
+        return {'message': f'Ошибка при удалении модели: {str(e)}'}
