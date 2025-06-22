@@ -2,37 +2,344 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Простой интерфейс к FastAPI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MySite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    button {
-      margin: 5px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FFFFFF;
+      color: #1E1E1E;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-bottom: 1px solid #D9D9D9;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1E1E1E;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    nav ul li a {
+      font-weight: 400;
+      font-size: 16px;
+      color: #1E1E1E;
+    }
+
+    nav ul li a:hover {
+      color: #0066CC;
+    }
+
+    .btn-started {
       padding: 10px 20px;
+      background-color: #E3E3E3;
+      border: 1px solid #767676;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
     }
-    pre {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f0f0f0;
-      white-space: pre-wrap;
-      max-height: 400px;
-      overflow: auto;
+
+    .btn-started:hover {
+      background-color: #0066CC;
+      color: white;
+      border-color: #0066CC;
     }
-    input[type="text"] {
-      width: 80%;
-      padding: 8px;
-      margin: 5px 0;
+
+    /* Hero Section */
+  .hero {
+      background-image: url('https://sportishka.com/uploads/posts/2022-04/1651348444_1-sportishka-com-p-razmitaya-mashina-mashini-krasivo-foto-1.jpg');
+      background-size: cover;      /* Растягивает картинку на весь блок */
+      background-position: center; /* Центрирует картинку */
+      background-repeat: no-repeat;
+      padding: 78px 64px 174px;
+      text-align: center;
+      color: white; /* Чтобы текст был виден на фоне */
+    }
+
+    .hero h1 {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero p {
+      font-size: 32px;
+      font-weight: 400;
+      color: #D3D3D3;
+      line-height: 1.2;
+    }
+
+    /* Features Section */
+    .features-container {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 64px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 300px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      font-size: 20px;
+      font-weight: 400;
+      color: #757575;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      padding: 24px;
+      background-color: #FFFFFF;
+      border: 1px solid #D9D9D9;
+      border-radius: 8px;
+      gap: 24px;
+    }
+
+    .card-image {
+      width: 160px;
+      min-width: 160px;
+      height: 160px;
+      background-color: #E3E3E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .card-text {
+      font-size: 16px;
+      line-height: 1.4;
+      color: #757575;
+    }
+
+    .card-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+    }
+
+    .card-btn {
+      padding: 12px;
+      background-color: #E3E3E3;
+      border: 1px solid #767676;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 32px 160px;
+      border-top: 1px solid #D9D9D9;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-width: 240px;
+    }
+
+    .footer-logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1E1E1E;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links strong {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .footer-links a {
+      font-size: 16px;
+      color: #1E1E1E;
+      opacity: 0.7;
+    }
+
+    .footer-links a:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .features-container,
+      .hero,
+      header {
+        padding: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Управление базой данных</h2>
-  <button id="fill-data">Заполнить тестовыми данными</button>
-  <button id="clear-data">Очистить все таблицы</button>
-  <button id="get-data">Получить все данные</button>
-  <br />
+
+  <!-- Header -->
+  <header>
+    <div class="logo">CarTaker</div>
+    <nav>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Управление базой данных</h1>
+    <p>Проект каршеринга "CarTaker"</p>
+  </section>
+
+  <!-- Features -->
+  <section class="features-container">
+    <div class="section-header">
+      <h2>Каршеринг</h2>
+      <p>Выберите основные опции</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Заполнить тестовыми данными</h3>
+          <p class="card-text">Для примера можно заполнить таблицы готовыми данными</p>
+          <div class="card-buttons">
+            <button id="fill-data" class="card-btn">FILL</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">Удаление</h3>
+          <p class="card-text">Удаление всех данных из таблиц</p>
+          <div class="card-buttons">
+            <button id="clear-data" class="card-btn">DELETE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br />
   <label for="sql-query">Выполнить SQL запрос:</label><br />
   <input type="text" id="sql-query" placeholder="Введите SQL-запрос" />
   <button id="run-sql">Выполнить</button>
   <pre id="output"></pre>
+  </section>
+
+<!-- Выбор таблиц -->
+<div style="padding: 20px;">
+  <label><input type="checkbox" name="table" value="models" checked> Модели</label>
+  <label><input type="checkbox" name="table" value="cars" checked> Машины</label>
+  <label><input type="checkbox" name="table" value="users"> Пользователи</label>
+  <label><input type="checkbox" name="table" value="passport"> Паспорта</label>
+  <label><input type="checkbox" name="table" value="driver_license"> Водительские права</label>
+  <label><input type="checkbox" name="table" value="tariffs"> Тарифы</label>
+  <button onclick="renderTables()">Показать</button>
+</div>
+
+<!-- Контейнер для таблиц -->
+<div id="tables-container" class="features-container"></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-column">
+      <div class="footer-logo">MySite</div>
+      <div class="footer-links">
+        <strong>Resources</strong>
+        <a href="#">Terms & Conditions</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+    <div class="footer-column">
+      <div class="footer-links">
+        <strong>Support</strong>
+        <a href="#">Help Center</a>
+        <a href="#">Contact Us</a>
+        <a href="#">FAQ</a>
+      </div>
+    </div>
+    <div class="footer-column">
+      <div class="footer-links">
+        <strong>Company</strong>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const output = document.getElementById('output');
@@ -67,7 +374,7 @@
     };
 
     document.getElementById('get-data').onclick = () => {
-      fetchApi('/api/get_all_data');
+      fetchApiData('/api/get_all_data');
     };
 
     document.getElementById('run-sql').onclick = () => {
@@ -83,6 +390,136 @@
       const body = method === 'POST' ? { sql_query: sql } : null;
       fetchApi(url, method, body);
     };
-  </script>
+
+</script>
+
+<script>
+  // Парсер SQL-like строк
+  function parseSQLLikeArray(str) {
+    if (!str || str === "[]" || str.trim() === "") return [];
+
+    return str
+      .slice(1, -1)
+      .split("),")
+      .map(record =>
+        record
+          .trim()
+          .replace(/^\(|\)$/g, "")
+          .split(",")
+          .map(field => field.trim().replace(/^'(.*)'$/g, "$1").replace(/null/gi, ""))
+      );
+  }
+
+  // Создание таблицы
+  function createTable(name, headers, rows) {
+    const container = document.createElement('div');
+    container.className = 'card';
+    container.style.width = '100%';
+
+    const title = document.createElement('h3');
+    title.textContent = name;
+    title.style.marginBottom = '10px';
+    container.appendChild(title);
+
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.textAlign = 'left';
+
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+
+    headers.forEach(text => {
+      const th = document.createElement('th');
+      th.textContent = text;
+      th.style.border = '1px solid #ccc';
+      th.style.padding = '8px';
+      trHead.appendChild(th);
+    });
+
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      row.forEach(cell => {
+        const td = document.createElement('td');
+        td.textContent = cell;
+        td.style.border = '1px solid #ccc';
+        td.style.padding = '6px';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    return container;
+  }
+
+  // Основная функция для загрузки и отображения данных
+  async function renderTables() {
+    const container = document.getElementById('tables-container');
+    container.innerHTML = '<p>Загрузка данных...</p>';
+
+    try {
+      const res = await fetch('/api/get_all_data');
+      const data = await res.json();
+
+      container.innerHTML = ''; // Очистить предыдущие таблицы
+
+      const checkboxes = document.querySelectorAll('input[name="table"]:checked');
+
+      checkboxes.forEach(cb => {
+        const tableName = cb.value;
+        let headers = [];
+        let parsedData = [];
+
+        switch (tableName) {
+          case 'models':
+            headers = ['ID', 'Производитель', 'Модель', 'Мощность'];
+            parsedData = parseSQLLikeArray(data.models);
+            break;
+          case 'cars':
+            headers = ['ID', 'Цена', 'Гос. номер', 'VIN', 'Дата покупки', 'Город', 'Широта', 'Фото', 'Модель ID'];
+            parsedData = parseSQLLikeArray(data.cars);
+            break;
+          case 'users':
+            headers = ['ID', 'Имя'];
+            parsedData = parseSQLLikeArray(data.users);
+            break;
+          case 'passport':
+            headers = ['ID', 'Серия', 'Номер', 'Дата рождения', 'Пользователь ID'];
+            parsedData = parseSQLLikeArray(data.passport);
+            break;
+          case 'driver_license':
+            headers = ['ID', 'Дата выдачи', 'Дата окончания', 'Пользователь ID'];
+            parsedData = parseSQLLikeArray(data.driver_license);
+            break;
+          case 'tariffs':
+            headers = ['ID', 'Цена за минуту', 'Дата начала', 'Дата окончания', 'Модель ID'];
+            parsedData = parseSQLLikeArray(data.tariffs);
+            break;
+          default:
+            parsedData = [];
+            headers = [];
+        }
+
+        if (parsedData.length > 0) {
+          const table = createTable(tableName, headers, parsedData);
+          container.appendChild(table);
+        }
+      });
+
+    } catch (error) {
+      console.error('Ошибка:', error);
+      container.innerHTML = '<p>Не удалось загрузить данные</p>';
+    }
+  }
+</script>
+
 </body>
 </html>
