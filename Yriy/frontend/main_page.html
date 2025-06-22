@@ -569,6 +569,14 @@
   <label><input type="checkbox" name="table" value="driver_license"> Водительские права</label>
   <label><input type="checkbox" name="table" value="tariffs"> Тарифы</label>
   <label><input type="checkbox" name="table" value="trip"> Поездки</label>
+  <br><br>
+  <strong>Специальные запросы:</strong><br>
+  <label><input type="checkbox" name="special_table" value="user_payments"> Платежи пользователя</label>
+  <input type="number" id="user_id_for_payments" placeholder="ID пользователя" style="width: 120px; margin-left: 10px;">
+  <br>
+  <label><input type="checkbox" name="special_table" value="car_repairs"> Ремонты автомобиля</label>
+  <input type="number" id="car_id_for_repairs" placeholder="ID автомобиля" style="width: 120px; margin-left: 10px;">
+  <br><br>
   <button onclick="renderTables()">Показать</button>
 </div>
 
@@ -632,28 +640,22 @@
   <!-- Footer -->
   <footer>
     <div class="footer-column">
-      <div class="footer-logo">MySite</div>
+      <div class="footer-logo">CarTaker</div>
       <div class="footer-links">
         <strong>Resources</strong>
-        <a href="#">Terms & Conditions</a>
         <a href="#">Privacy Policy</a>
-        <a href="#">Cookies</a>
       </div>
     </div>
     <div class="footer-column">
       <div class="footer-links">
         <strong>Support</strong>
-        <a href="#">Help Center</a>
-        <a href="#">Contact Us</a>
-        <a href="#">FAQ</a>
+        <a href="https://github.com/MKYrii/db_project.git">Contact Us</a>
       </div>
     </div>
     <div class="footer-column">
       <div class="footer-links">
         <strong>Company</strong>
-        <a href="#">About Us</a>
-        <a href="#">Careers</a>
-        <a href="#">Blog</a>
+        <a href="https://itmo.ru/">About Us</a>
       </div>
     </div>
   </footer>
@@ -1159,7 +1161,9 @@
       container.innerHTML = ''; // Очистить предыдущие таблицы
 
       const checkboxes = document.querySelectorAll('input[name="table"]:checked');
+      const specialCheckboxes = document.querySelectorAll('input[name="special_table"]:checked');
 
+      // Process regular tables
       checkboxes.forEach(cb => {
         const tableName = cb.value;
         let headers = [];
@@ -1208,7 +1212,67 @@
         }
       });
 
-      addLogMessage(`Таблицы успешно отображены. Загружено ${checkboxes.length} таблиц.`, 'success', 'Table Render Complete');
+      // Process special tables that require parameters
+      for (const cb of specialCheckboxes) {
+        const tableName = cb.value;
+        
+        if (tableName === 'user_payments') {
+          const userId = document.getElementById('user_id_for_payments').value;
+          if (!userId) {
+            addLogMessage('Для отображения платежей пользователя необходимо указать ID пользователя', 'warning', 'Missing Parameter');
+            continue;
+          }
+          
+          try {
+            addLogMessage(`Загрузка платежей для пользователя ID: ${userId}`, 'info', 'Loading User Payments');
+            const response = await fetch(`/api/show_user_payments?user_id=${userId}`);
+            const result = await response.text();
+            
+            let parsedData = parseSQLLikeArray(result);
+            const headers = ['ID', 'Описание', 'Сумма', 'Дата', 'Срок', 'Тип', 'Пользователь ID'];
+            
+            if (parsedData.length > 0) {
+              const table = createTable(`Платежи пользователя (ID: ${userId})`, headers, parsedData);
+              container.appendChild(table);
+              addLogMessage(`Загружено ${parsedData.length} платежей для пользователя ${userId}`, 'success', 'User Payments Loaded');
+            } else {
+              addLogMessage(`Нет платежей для пользователя с ID: ${userId}`, 'info', 'No User Payments');
+            }
+          } catch (error) {
+            addLogMessage(`Ошибка при загрузке платежей пользователя: ${error.message}`, 'error', 'User Payments Error');
+          }
+        }
+        
+        else if (tableName === 'car_repairs') {
+          const carId = document.getElementById('car_id_for_repairs').value;
+          if (!carId) {
+            addLogMessage('Для отображения ремонтов автомобиля необходимо указать ID автомобиля', 'warning', 'Missing Parameter');
+            continue;
+          }
+          
+          try {
+            addLogMessage(`Загрузка ремонтов для автомобиля ID: ${carId}`, 'info', 'Loading Car Repairs');
+            const response = await fetch(`/api/show_car_repairs?car_id=${carId}`);
+            const result = await response.text();
+            
+            let parsedData = parseSQLLikeArray(result);
+            const headers = ['ID', 'Описание', 'Дата/время', 'Автомобиль ID'];
+            
+            if (parsedData.length > 0) {
+              const table = createTable(`Ремонты автомобиля (ID: ${carId})`, headers, parsedData);
+              container.appendChild(table);
+              addLogMessage(`Загружено ${parsedData.length} ремонтов для автомобиля ${carId}`, 'success', 'Car Repairs Loaded');
+            } else {
+              addLogMessage(`Нет ремонтов для автомобиля с ID: ${carId}`, 'info', 'No Car Repairs');
+            }
+          } catch (error) {
+            addLogMessage(`Ошибка при загрузке ремонтов автомобиля: ${error.message}`, 'error', 'Car Repairs Error');
+          }
+        }
+      }
+
+      const totalTables = checkboxes.length + specialCheckboxes.length;
+      addLogMessage(`Таблицы успешно отображены. Загружено ${totalTables} таблиц.`, 'success', 'Table Render Complete');
 
     } catch (error) {
       console.error('Ошибка:', error);
