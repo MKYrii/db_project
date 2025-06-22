@@ -333,3 +333,173 @@ async def add_payment(
         return {'message': 'Payment added successfully'}
     except Exception as e:
         return {'message': f'Something went wrong: {str(e)}'}
+
+
+@router.post('/add_car')
+async def add_car(
+    mileage: int,
+    licence: str,
+    serial_number: str,
+    buying_date: date,
+    city: str,
+    coordinates: float,
+    model_id: int,
+    malfunctions: str = None
+):
+    """
+    Добавляет новую машину в базу данных.
+    Параметры:
+    - mileage: пробег
+    - licence: номерной знак
+    - serial_number: VIN/серийный номер
+    - buying_date: дата покупки
+    - city: город
+    - coordinates: координаты
+    - model_id: id модели
+    - malfunctions: неисправности (опционально)
+    """
+    try:
+        with engine.begin() as conn:
+            # Проверка существования модели
+            model_check = conn.execute(text("SELECT 1 FROM Models WHERE model_id = :model_id"), {"model_id": model_id}).fetchone()
+            if not model_check:
+                return {'message': f'Модель с id {model_id} не найдена'}
+            query = text("""
+                INSERT INTO Cars (mileage, licence, serial_number, buying_date, city, coordinates, malfunctions, model_id)
+                VALUES (:mileage, :licence, :serial_number, :buying_date, :city, :coordinates, :malfunctions, :model_id)
+            """)
+            conn.execute(query, {
+                "mileage": mileage,
+                "licence": licence,
+                "serial_number": serial_number,
+                "buying_date": buying_date,
+                "city": city,
+                "coordinates": coordinates,
+                "malfunctions": malfunctions,
+                "model_id": model_id
+            })
+            conn.commit()
+        return {'message': 'Машина успешно добавлена'}
+    except Exception as e:
+        return {'message': f'Ошибка при добавлении машины: {str(e)}'}
+
+
+@router.post('/add_user')
+async def add_user(user_name: str):
+    """
+    Добавляет нового пользователя в базу данных.
+    Параметры:
+    - user_name: имя пользователя
+    """
+    try:
+        with engine.begin() as conn:
+            query = text("""
+                INSERT INTO Users (user_name)
+                VALUES (:user_name)
+            """)
+            conn.execute(query, {"user_name": user_name})
+            conn.commit()
+        return {'message': 'Пользователь успешно добавлен'}
+    except Exception as e:
+        return {'message': f'Ошибка при добавлении пользователя: {str(e)}'}
+
+
+@router.post('/add_driver_license')
+async def add_driver_license(
+    date_of_issue: date,
+    expiration_date: date,
+    user_id: int
+):
+    """
+    Добавляет водительские права для пользователя.
+    Параметры:
+    - date_of_issue: дата выдачи
+    - expiration_date: дата окончания
+    - user_id: id пользователя
+    """
+    try:
+        with engine.begin() as conn:
+            # Проверка существования пользователя
+            user_check = conn.execute(text("SELECT 1 FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+            if not user_check:
+                return {'message': f'Пользователь с id {user_id} не найден'}
+            query = text("""
+                INSERT INTO Driver_license (date_of_issue, expiration_date, user_id)
+                VALUES (:date_of_issue, :expiration_date, :user_id)
+            """)
+            conn.execute(query, {
+                "date_of_issue": date_of_issue,
+                "expiration_date": expiration_date,
+                "user_id": user_id
+            })
+            conn.commit()
+        return {'message': 'Водительские права успешно добавлены'}
+    except Exception as e:
+        return {'message': f'Ошибка при добавлении водительских прав: {str(e)}'}
+
+
+@router.post('/add_passport')
+async def add_passport(
+    passport_number: str,
+    serial_number: str,
+    birth_date: date,
+    user_id: int
+):
+    """
+    Добавляет паспорт для пользователя.
+    Параметры:
+    - passport_number: номер паспорта
+    - serial_number: серия паспорта
+    - birth_date: дата рождения
+    - user_id: id пользователя
+    """
+    try:
+        with engine.begin() as conn:
+            # Проверка существования пользователя
+            user_check = conn.execute(text("SELECT 1 FROM Users WHERE user_id = :user_id"), {"user_id": user_id}).fetchone()
+            if not user_check:
+                return {'message': f'Пользователь с id {user_id} не найден'}
+            query = text("""
+                INSERT INTO Passport (passport_number, serial_number, birth_date, user_id)
+                VALUES (:passport_number, :serial_number, :birth_date, :user_id)
+            """)
+            conn.execute(query, {
+                "passport_number": passport_number,
+                "serial_number": serial_number,
+                "birth_date": birth_date,
+                "user_id": user_id
+            })
+            conn.commit()
+        return {'message': 'Паспорт успешно добавлен'}
+    except Exception as e:
+        return {'message': f'Ошибка при добавлении паспорта: {str(e)}'}
+
+
+@router.post('/add_model')
+async def add_model(
+    brand: str,
+    model_name: str,
+    power: int
+):
+    """
+    Добавляет новую модель автомобиля.
+    Параметры:
+    - brand: марка
+    - model_name: название модели
+    - power: мощность
+    """
+    try:
+        with engine.begin() as conn:
+            query = text("""
+                INSERT INTO Models (brand, model_name, power)
+                VALUES (:brand, :model_name, :power)
+            """)
+            conn.execute(query, {
+                "brand": brand,
+                "model_name": model_name,
+                "power": power
+            })
+            conn.commit()
+        return {'message': 'Модель успешно добавлена'}
+    except Exception as e:
+        return {'message': f'Ошибка при добавлении модели: {str(e)}'}
