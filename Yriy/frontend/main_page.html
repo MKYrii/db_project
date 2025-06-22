@@ -578,6 +578,7 @@
   <input type="number" id="car_id_for_repairs" placeholder="ID автомобиля" style="width: 120px; margin-left: 10px;">
   <br><br>
   <button onclick="renderTables()">Показать</button>
+  <button onclick="testTableData()" style="background-color: #17a2b8; color: white; margin-left: 10px;">Тест данных</button>
 </div>
 
 <!-- Контейнер для таблиц -->
@@ -1080,18 +1081,66 @@
 <script>
   // Парсер SQL-like строк
   function parseSQLLikeArray(str) {
-    if (!str || str === "[]" || str.trim() === "") return [];
+    if (!str || str === "[]" || str.trim() === "") {
+      console.log('Empty or null data received');
+      return [];
+    }
 
-    return str
-      .slice(1, -1)
-      .split("),")
-      .map(record =>
-        record
-          .trim()
-          .replace(/^\(|\)$/g, "")
-          .split(",")
-          .map(field => field.trim().replace(/^'(.*)'$/g, "$1").replace(/null/gi, ""))
-      );
+    try {
+      // If it's already an array, return it
+      if (Array.isArray(str)) {
+        return str;
+      }
+
+      // If it's a JSON string, try to parse it
+      if (typeof str === 'string' && str.startsWith('[')) {
+        try {
+          const parsed = JSON.parse(str);
+          if (Array.isArray(parsed)) {
+            return parsed;
+          }
+        } catch (e) {
+          console.log('Not a valid JSON array, trying SQL-like parsing');
+        }
+      }
+
+      // SQL-like string parsing
+      const cleanedStr = str.trim();
+      console.log('Parsing string:', cleanedStr.substring(0, 200) + '...');
+      
+      // Handle different formats
+      if (cleanedStr === "[]" || cleanedStr === "()") {
+        return [];
+      }
+      
+      // Remove outer parentheses if they exist
+      let dataStr = cleanedStr;
+      if (cleanedStr.startsWith('(') && cleanedStr.endsWith(')')) {
+        dataStr = cleanedStr.slice(1, -1);
+      }
+      
+      // Split by records
+      const records = dataStr.split("),(");
+      
+      return records.map(record => {
+        const cleanedRecord = record.trim().replace(/^\(|\)$/g, "");
+        const fields = cleanedRecord.split(",");
+        
+        return fields.map(field => {
+          const trimmedField = field.trim();
+          // Remove quotes and handle null values
+          if (trimmedField === "null" || trimmedField === "NULL" || trimmedField === "None") {
+            return "";
+          }
+          // Remove single and double quotes
+          return trimmedField.replace(/^'(.*)'$/g, "$1").replace(/^"(.*)"$/g, "$1");
+        });
+      });
+    } catch (error) {
+      console.error('Error parsing data:', error, 'Data:', str);
+      addLogMessage(`Ошибка парсинга данных: ${error.message}`, 'error', 'Parse Error');
+      return [];
+    }
   }
 
   // Создание таблицы
@@ -1144,6 +1193,52 @@
     return container;
   }
 
+  // Function to find table name regardless of case
+  function findTableName(data, targetName) {
+    const availableTables = Object.keys(data);
+    const targetLower = targetName.toLowerCase();
+    
+    // Exact match
+    if (availableTables.includes(targetName)) {
+      return targetName;
+    }
+    
+    // Case-insensitive match
+    for (const table of availableTables) {
+      if (table.toLowerCase() === targetLower) {
+        return table;
+      }
+    }
+    
+    // Partial match (for cases like 'driver_license' vs 'driverlicenses')
+    for (const table of availableTables) {
+      if (table.toLowerCase().includes(targetLower) || targetLower.includes(table.toLowerCase())) {
+        return table;
+      }
+    }
+    
+    return null;
+  }
+
+  // Debug function to analyze data structure
+  function debugDataStructure(data) {
+    console.log('=== DEBUG: Data Structure Analysis ===');
+    console.log('Data type:', typeof data);
+    console.log('Available keys:', Object.keys(data));
+    
+    Object.keys(data).forEach(key => {
+      const value = data[key];
+      console.log(`\nTable: ${key}`);
+      console.log('Type:', typeof value);
+      console.log('Value:', value);
+      if (typeof value === 'string') {
+        console.log('Length:', value.length);
+        console.log('First 200 chars:', value.substring(0, 200));
+      }
+    });
+    console.log('=== END DEBUG ===');
+  }
+
   // Основная функция для загрузки и отображения данных
   async function renderTables() {
     const container = document.getElementById('tables-container');
@@ -1154,8 +1249,9 @@
       const res = await fetch('/api/get_all_data');
       const data = await res.json();
 
-      // Debug: Log available table names
+      // Debug: Log available table names and analyze data structure
       console.log('Available tables:', Object.keys(data));
+      debugDataStructure(data);
       addLogMessage(`Доступные таблицы: ${Object.keys(data).join(', ')}`, 'info', 'Available Tables');
 
       container.innerHTML = ''; // Очистить предыдущие таблицы
@@ -1168,47 +1264,66 @@
         const tableName = cb.value;
         let headers = [];
         let parsedData = [];
+        let actualTableName = tableName;
 
+        // Map frontend table names to actual database table names
         switch (tableName) {
           case 'models':
+            actualTableName = 'models';
             headers = ['ID', 'Производитель', 'Модель', 'Мощность'];
-            parsedData = parseSQLLikeArray(data.models);
             break;
           case 'cars':
-            headers = ['ID', 'Цена', 'Гос. номер', 'VIN', 'Дата покупки', 'Город', 'Широта', 'Фото', 'Модель ID'];
-            parsedData = parseSQLLikeArray(data.cars);
+            actualTableName = 'cars';
+            headers = ['ID', 'Пробег', 'Гос. номер', 'VIN', 'Дата покупки', 'Город', 'Координаты', 'Неисправности', 'Модель ID'];
             break;
           case 'users':
-            headers = ['ID', 'Имя'];
-            parsedData = parseSQLLikeArray(data.users);
+            actualTableName = 'users';
+            headers = ['ID', 'Имя пользователя'];
             break;
           case 'passport':
-            headers = ['ID', 'Серия', 'Номер', 'Дата рождения', 'Пользователь ID'];
-            parsedData = parseSQLLikeArray(data.passport);
+            actualTableName = 'passport';
+            headers = ['ID', 'Номер паспорта', 'Серия', 'Дата рождения', 'Пользователь ID'];
             break;
           case 'driver_license':
+            actualTableName = 'driver_license';
             headers = ['ID', 'Дата выдачи', 'Дата окончания', 'Пользователь ID'];
-            parsedData = parseSQLLikeArray(data.driver_license);
             break;
           case 'tariffs':
-            headers = ['ID', 'Цена за минуту', 'Дата начала', 'Дата окончания', 'Модель ID'];
-            parsedData = parseSQLLikeArray(data.tariffs);
+            actualTableName = 'tariffs';
+            headers = ['ID', 'Цена за минуту', 'Время начала', 'Время окончания', 'Модель ID'];
             break;
           case 'trip':
+            actualTableName = 'trip';
             headers = ['ID', 'Время начала', 'Время окончания', 'Проблемы', 'Комментарии', 'Автомобиль ID', 'Пользователь ID'];
-            parsedData = parseSQLLikeArray(data.trip);
             break;
           default:
-            parsedData = [];
+            actualTableName = tableName;
             headers = [];
+        }
+
+        // Try to get data from the actual table name
+        const foundTableName = findTableName(data, actualTableName);
+        if (foundTableName) {
+          parsedData = parseSQLLikeArray(data[foundTableName]);
+          addLogMessage(`Данные для таблицы ${tableName} (найдена как ${foundTableName}): ${parsedData.length} записей`, 'info', 'Data Found');
+        } else {
+          addLogMessage(`Таблица ${tableName} (${actualTableName}) не найдена в данных`, 'warning', 'Table Not Found');
+          console.log(`Table ${tableName} (${actualTableName}) not found. Available tables:`, Object.keys(data));
         }
 
         if (parsedData.length > 0) {
           const table = createTable(tableName, headers, parsedData);
           container.appendChild(table);
+          addLogMessage(`Таблица ${tableName} успешно отображена`, 'success', 'Table Displayed');
         } else {
-          console.log(`No data found for table: ${tableName}`);
+          console.log(`No data found for table: ${tableName} (tried: ${actualTableName})`);
           addLogMessage(`Нет данных для таблицы: ${tableName}`, 'warning', 'No Data');
+          
+          // Show empty table with headers for debugging
+          if (headers.length > 0) {
+            const emptyTable = createTable(`${tableName} (пустая)`, headers, []);
+            container.appendChild(emptyTable);
+          }
         }
       });
 
@@ -1278,6 +1393,42 @@
       console.error('Ошибка:', error);
       container.innerHTML = '<p>Не удалось загрузить данные</p>';
       addLogMessage(`Ошибка при загрузке таблиц: ${error.message}`, 'error', 'Table Render Error');
+    }
+  }
+
+  // Test function to debug table data
+  async function testTableData() {
+    addLogMessage('=== ТЕСТ ДАННЫХ ТАБЛИЦ ===', 'info', 'Test Start');
+    
+    try {
+      const res = await fetch('/api/get_all_data');
+      const data = await res.json();
+      
+      addLogMessage(`Получено ${Object.keys(data).length} таблиц`, 'info', 'Tables Count');
+      
+      Object.keys(data).forEach(tableName => {
+        const tableData = data[tableName];
+        addLogMessage(`Таблица: ${tableName}`, 'info', 'Table Name');
+        addLogMessage(`Тип данных: ${typeof tableData}`, 'info', 'Data Type');
+        addLogMessage(`Длина: ${tableData ? tableData.length : 'N/A'}`, 'info', 'Data Length');
+        
+        if (typeof tableData === 'string') {
+          addLogMessage(`Первые 200 символов: ${tableData.substring(0, 200)}`, 'info', 'Data Preview');
+          
+          // Try to parse the data
+          const parsed = parseSQLLikeArray(tableData);
+          addLogMessage(`Парсинг: ${parsed.length} записей`, 'info', 'Parse Result');
+          
+          if (parsed.length > 0) {
+            addLogMessage(`Первая запись: ${JSON.stringify(parsed[0])}`, 'info', 'First Record');
+          }
+        }
+        
+        addLogMessage('---', 'info', 'Separator');
+      });
+      
+    } catch (error) {
+      addLogMessage(`Ошибка тестирования: ${error.message}`, 'error', 'Test Error');
     }
   }
 </script>
