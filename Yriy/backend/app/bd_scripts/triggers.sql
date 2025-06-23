@@ -63,3 +63,9 @@ BEGIN
         FOR EACH ROW EXECUTE FUNCTION validate_trip_end_time();
     END IF;
 END $$;
+
+
+CREATE INDEX idx_trips_user_id ON trips(user_id);
+CREATE INDEX idx_trips_car_id ON trips(car_id);
+
+CREATE INDEX idx_payments_payment_time ON payments(payment_time);
